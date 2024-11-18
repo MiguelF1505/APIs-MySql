@@ -1,0 +1,58 @@
+{
+  "Version": 1,
+  "Hash": "FE5Q0C8FbIg+BaiWpOIwyL31hPBHEerc3hK3jRI6YVg=",
+  "Source": "RestAPI",
+  "BasePath": "_content/RestAPI",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "RestAPI\\wwwroot",
+      "Source": "RestAPI",
+      "ContentRoot": "G:\\Projeto4BimHelioEsperidiao\\Kestrel\\wwwroot\\",
+      "BasePath": "_content/RestAPI",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "G:\\Projeto4BimHelioEsperidiao\\Kestrel\\wwwroot\\launchSettings.json",
+      "SourceId": "RestAPI",
+      "SourceType": "Discovered",
+      "ContentRoot": "G:\\Projeto4BimHelioEsperidiao\\Kestrel\\wwwroot\\",
+      "BasePath": "_content/RestAPI",
+      "RelativePath": "launchSettings.json",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\launchSettings.json"
+    },
+    {
+      "Identity": "G:\\Projeto4BimHelioEsperidiao\\Kestrel\\wwwroot\\teste.html",
+      "SourceId": "RestAPI",
+      "SourceType": "Discovered",
+      "ContentRoot": "G:\\Projeto4BimHelioEsperidiao\\Kestrel\\wwwroot\\",
+      "BasePath": "_content/RestAPI",
+      "RelativePath": "teste.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\teste.html"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "Files": [
+    {
+      "Id": "G:\\Projeto4BimHelioEsperidiao\\Kestrel\\wwwroot\\launchSettings.json",
+      "PackagePath": "staticwebassets\\launchSettings.json"
+    },
+    {
+      "Id": "G:\\Projeto4BimHelioEsperidiao\\Kestrel\\wwwroot\\teste.html",
+      "PackagePath": "staticwebassets\\teste.html"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.RestAPI.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.RestAPI.props",
+      "PackagePath": "build\\RestAPI.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.RestAPI.props",
+      "PackagePath": "buildMultiTargeting\\RestAPI.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.RestAPI.props",
+      "PackagePath": "buildTransitive\\RestAPI.props"
+    }
+  ],
+  "ElementsToRemove": []
+}
