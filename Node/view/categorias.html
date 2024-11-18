@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="styleControl.css">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Oswald:wght@500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <a href="painel.html" class="PainelRet">Painel</a><br>
+    <div class="input">
+        <input type="text" id="txtNomeCategoria" placeholder="Nome Categoria">
+        <input type="text" id="txtDescontoCategoria" placeholder="Desconto Categoria">
+        <input type="text" id="txtSetorCategoria" placeholder="Setor Categoria"><br>
+        <a id="btnCadastrar" class="enviar">Cadastrar Categoria</a>
+        <div id="divDados"></div>
+    </div>
+</body>
+<script>
+    let JSON_Categorias = {};
+    const dadosLocalStorage = localStorage.getItem("dados");
+    const objUsuario = JSON.parse(dadosLocalStorage);
+
+    const divDados = document.getElementById("divDados");
+    const txtCategoria = document.getElementById("txtNomeCategoria");
+    const txtDescontoCategoria = document.getElementById("txtDescontoCategoria");
+    const txtSetorCategoria = document.getElementById("txtSetorCategoria");
+
+    const btnCadastrar = document.getElementById("btnCadastrar");
+
+    const tabela = document.createElement("table");
+
+    divDados.appendChild(tabela);
+    const linha1 = document.createElement("tr");
+    const td0 = document.createElement("th");
+    const td1 = document.createElement("th");
+    const td2 = document.createElement("th");
+    const td3 = document.createElement("th");
+    const td4 = document.createElement("th");
+    const td5 = document.createElement("th");
+    td0.appendChild(document.createTextNode("NOME"));
+    td1.appendChild(document.createTextNode("DESCONTO"));
+    td2.appendChild(document.createTextNode("SETOR"));
+    td3.appendChild(document.createTextNode("EXCLUIR"));
+    td4.appendChild(document.createTextNode("SELECIONAR"));
+    td5.appendChild(document.createTextNode("ATUALIZAR"));
+    linha1.appendChild(td0);
+    linha1.appendChild(td1);
+    linha1.appendChild(td2);
+    linha1.appendChild(td3);
+    linha1.appendChild(td4);
+    linha1.appendChild(td5);
+
+    get_Categorias();
+
+    btnCadastrar.onclick = function () {
+        post_Categorias();
+    }
+
+    function limparTabela() {
+        var qtdLinas = 1;
+        var totalLinhas = tabela.rows.length;
+        for (let i = qtdLinas; i < totalLinhas; i++) {
+            tabela.deleteRow(qtdLinas);
+        }
+
+    }
+    function delete_Categoria(idCategoria) {
+        const URI = "/categorias/" + idCategoria;
+        console.log(URI);
+        fetch(URI, {
+            method: "DELETE",
+            headers: {
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            console.log(respostaConvertida);
+            get_Categorias();
+        }).catch(erro => {
+            console.log(erro);
+        })
+    }
+    function construirTabela(objJson) {
+        limparTabela();
+
+        console.log(objJson.categorias);
+        const Categorias = objJson.categorias;
+
+
+        tabela.appendChild(linha1);
+        for (let Categoria of Categorias) {
+            
+            let NomeCategoria = Categoria.nome_categoria;
+            NomeCategoria = NomeCategoria.toLowerCase();
+            const linha1 = document.createElement("tr");
+            const btnExcluir = document.createElement("button");
+            btnExcluir.appendChild(document.createTextNode("Excluir"));
+            btnExcluir.onclick = function () {
+                const idCategoria = Categoria.id_categoria;
+                delete_Categoria(idCategoria);
+            }
+
+            const btnSelecionar = document.createElement("button");
+            btnSelecionar.appendChild(document.createTextNode("Selecionar"));
+            btnSelecionar.onclick = function () {
+                txtCategoria.value = Categoria.nome_categoria;
+                txtDescontoCategoria.value = Categoria.desconto_categoria;
+                txtSetorCategoria.value = Categoria.id_setor;
+            }
+
+            const btnAtualizar = document.createElement("button");
+            btnAtualizar.appendChild(document.createTextNode("Atualizar"));
+
+            btnAtualizar.onclick = function () {
+                const idCategoria = Categoria.Nome;
+                put_Categorias(idCategoria);
+            }
+
+            const td1 = document.createElement("td");
+            const td2 = document.createElement("td");
+            const td3 = document.createElement("td");
+            const td4 = document.createElement("td");
+            const td5 = document.createElement("td");
+            const td6 = document.createElement("td");
+            td1.appendChild(document.createTextNode(Categoria.nome_categoria));
+            td2.appendChild(document.createTextNode(Categoria.desconto_categoria + "%"));
+            td3.appendChild(document.createTextNode(Categoria.id_setor));
+            td4.appendChild(btnExcluir);
+            td5.appendChild(btnSelecionar);
+            td6.appendChild(btnAtualizar);
+
+            linha1.appendChild(td1);
+            linha1.appendChild(td2);
+            linha1.appendChild(td3);
+            linha1.appendChild(td4);
+            linha1.appendChild(td5);
+            linha1.appendChild(td6);
+            tabela.appendChild(linha1);
+        }
+    }
+
+    function get_Categorias() {
+        const URI = "/categorias";
+
+        fetch(URI, {
+            method: "GET",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            JSON_CategoriaS = JSON.parse(respostaConvertida);
+            console.log(JSON_CategoriaS.Categorias);
+            construirTabela(JSON_CategoriaS)
+        }).catch(erro => {
+            console.log(erro);
+        })
+    }
+
+
+    function put_Categorias(idCategoria) {
+        const URI = "/categorias/" + idCategoria;
+        const NomeCategoria = txtCategoria.value;
+        const DescontoCategoria = txtDescontoCategoria.value;
+        const SetorCategoria = txtSetorCategoria.value;
+        if (NomeCategoria == "") {
+            alert("o nome do Categoria não pode ser vazio");
+            return;
+
+        }
+
+        const objCategoria = {
+            categoria: {
+                nome_categoria: NomeCategoria,
+                desconto_categoria: DescontoCategoria,
+                setor_categoria: SetorCategoria
+            }
+        }
+
+        fetch(URI, {
+            method: "PUT",
+            body: JSON.stringify(objCategoria),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            const obj = JSON.parse(respostaConvertida);
+            if (obj.status == true) {
+                get_Categorias();
+            }
+            console.log(respostaConvertida);
+        }).catch(erro => {
+            console.log(erro);
+        })
+
+    }
+
+    function post_Categorias() {
+        const URI = "/categorias";
+        const NomeCategoria = txtCategoria.value;
+        const DescontoCategoria = txtDescontoCategoria.value;
+        const SetorCategoria = txtSetorCategoria.value;
+        if (NomeCategoria == "") {
+            alert("o nome da Categoria não pode ser vazio");
+            return;
+
+        }
+
+        const objCategoria = {
+            categoria: {
+                nome_categoria: NomeCategoria,
+                desconto_categoria: DescontoCategoria,
+                setor_categoria: SetorCategoria
+            }
+        }
+
+        fetch(URI, {
+            method: "POST",
+            body: JSON.stringify(objCategoria),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            const obj = JSON.parse(respostaConvertida);
+            if (obj.status == true) {
+                get_Categorias();
+            }
+            console.log(respostaConvertida);
+        }).catch(erro => {
+            console.log(erro);
+        })
+
+    }
+
+</script>
+
+</html>

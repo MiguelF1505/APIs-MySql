@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="styleControl.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Oswald:wght@500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <a href="painel.html" class="PainelRet">Painel</a><br>
+    <div class="input">
+        <input type="text" id="txtemailUsuario" placeholder="Email usuário">
+        <input type="password" id="txtSenha" placeholder="Senha Usuário"><br>
+        <a id="btnCadastrar" class="enviar">Cadastrar Usuario</a><br>
+        <div id="divDados"></div>
+    </div>
+</body>
+<script>
+    let JSON_Usuarios = {};
+    const dadosLocalStorage = localStorage.getItem("dados");
+    const objUsuario = JSON.parse(dadosLocalStorage);
+
+    const divDados = document.getElementById("divDados");
+    const txtUsuario = document.getElementById("txtemailUsuario");
+
+    const btnCadastrar = document.getElementById("btnCadastrar");
+
+    const tabela = document.createElement("table");
+
+    divDados.appendChild(tabela);
+    const linha1 = document.createElement("tr");
+    const td1 = document.createElement("th");
+    const td2 = document.createElement("th");
+    const td3 = document.createElement("th");
+    const td4 = document.createElement("th");
+    td1.appendChild(document.createTextNode("EMAIL DO USUÁRIO"));
+    td2.appendChild(document.createTextNode("EXCLUIR"));
+    td3.appendChild(document.createTextNode("SELECIONAR"));
+    td4.appendChild(document.createTextNode("ATUALIZAR"));
+    linha1.appendChild(td1);
+    linha1.appendChild(td2);
+    linha1.appendChild(td3);
+    linha1.appendChild(td4);
+
+    get_Usuarios();
+
+    btnCadastrar.onclick = function () {
+        post_Usuarios();
+    }
+
+    function limparTabela() {
+        var qtdLinas = 1;
+        var totalLinhas = tabela.rows.length;
+        for (let i = qtdLinas; i < totalLinhas; i++) {
+            tabela.deleteRow(qtdLinas);
+        }
+
+    }
+    
+    function delete_Usuario(idUsuario) {
+        const URI = "/usuarios/" + idUsuario;
+        console.log(URI);
+        fetch(URI, {
+            method: "DELETE",
+            headers: {
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            console.log(respostaConvertida);
+            get_Usuarios();
+        }).catch(erro => {
+            console.log(erro);
+        })
+    }
+
+    function construirTabela(objUsuarioSend) {
+        limparTabela();
+
+        console.log(objUsuarioSend.Usuarios);
+        const Usuarios = objUsuarioSend.usuarios;
+
+
+        tabela.appendChild(linha1);
+        for (let Usuario of Usuarios) {
+
+            let emailUsuario = Usuario.email;
+            emailUsuario = emailUsuario.toLowerCase();
+            const linha1 = document.createElement("tr");
+            const btnExcluir = document.createElement("button");
+            btnExcluir.appendChild(document.createTextNode("Excluir"));
+            btnExcluir.onclick = function () {
+                const idUsuario = Usuario.email;
+                delete_Usuario(idUsuario);
+            }
+
+            const btnSelecionar = document.createElement("button");
+            btnSelecionar.appendChild(document.createTextNode("Selecionar"));
+            btnSelecionar.onclick = function () {
+                const idUsuario = Usuario.email;
+                txtUsuario.value = Usuario.email;
+            }
+
+            const btnAtualizar = document.createElement("button");
+            btnAtualizar.appendChild(document.createTextNode("Atualizar"));
+
+            btnAtualizar.onclick = function () {
+                const idUsuario = Usuario.email;
+                put_Usuarios(idUsuario);
+            }
+
+            const td1 = document.createElement("td");
+            const td2 = document.createElement("td");
+            const td3 = document.createElement("td");
+            const td4 = document.createElement("td");
+            td1.appendChild(document.createTextNode(Usuario.email));
+            td2.appendChild(btnExcluir);
+            td3.appendChild(btnSelecionar);
+            td4.appendChild(btnAtualizar);
+
+            linha1.appendChild(td1);
+            linha1.appendChild(td2);
+            linha1.appendChild(td3);
+            linha1.appendChild(td4);
+            tabela.appendChild(linha1);
+        }
+    }
+
+    function get_Usuarios() {
+        const URI = "/usuarios";
+
+        fetch(URI, {
+            method: "GET",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            JSON_UsuarioS = JSON.parse(respostaConvertida);
+            console.log(JSON_UsuarioS.usuarios);
+            construirTabela(JSON_UsuarioS)
+        }).catch(erro => {
+            console.log(erro);
+        })
+    }
+
+
+    function put_Usuarios(idUsuario) {
+        const URI = "/usuarios/" + idUsuario;
+        const emailUsuario = txtUsuario.value;
+        const senhaUsuario = txtSenha.value;
+        if (emailUsuario == "") {
+            alert("o nome do Usuario não pode ser vazio");
+            return;
+
+        }
+
+        const objUsuarioSend = {
+            usuario: {
+                email: emailUsuario,
+                senha: senhaUsuario
+            }
+        }
+
+        fetch(URI, {
+            method: "PUT",
+            body: JSON.stringify(objUsuarioSend),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            const obj = JSON.parse(respostaConvertida);
+            if (obj.status == true) {
+                get_Usuarios();
+            }
+            console.log(respostaConvertida);
+        }).catch(erro => {
+            console.log(erro);
+        })
+
+    }
+
+    function post_Usuarios() {
+        const URI = "/usuarios";
+        const emailUsuario = txtUsuario.value;
+        const senhaUsuario = txtSenha.value;
+        if (emailUsuario == "") {
+            alert("o nome do Usuario não pode ser vazio");
+            return;
+
+        }
+
+        const objUsuarioSend = {
+            usuario: {
+                email: emailUsuario,
+                senha: senhaUsuario
+            }
+        }
+
+        fetch(URI, {
+            method: "POST",
+            body: JSON.stringify(objUsuarioSend),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            const obj = JSON.parse(respostaConvertida);
+            if (obj.status == true) {
+                get_Usuarios();
+            }
+            console.log(respostaConvertida);
+        }).catch(erro => {
+            console.log(erro);
+        })
+
+    }
+
+</script>
+
+</html>

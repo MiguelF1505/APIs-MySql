@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="styleControl.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Oswald:wght@500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <a href="painel.html" class="PainelRet">Painel</a><br>
+    <div class="input">
+        <input type="file" id="txtArquivo">
+        <button id="btnEnviar">Enviar Json</button><br><br>
+        <input type="text" id="txtnome_setor" placeholder="Nome Setor"><br>
+        <a id="btnCadastrar" class="enviar">Cadastrar Setor</a><br>
+        <div id="divDados"></div>
+    </div>
+</body>
+<script>
+    var id_selecionado = -1;
+    let JSON_setores = {};
+    const dadosLocalStorage = localStorage.getItem("dados");
+    const objUsuario = JSON.parse(dadosLocalStorage);
+
+    const divDados = document.getElementById("divDados");
+    const txtSetor = document.getElementById("txtnome_setor");
+
+    const btnCadastrar = document.getElementById("btnCadastrar");
+
+    const tabela = document.createElement("table");
+
+    divDados.appendChild(tabela);
+    const linha1 = document.createElement("tr");
+    const td1 = document.createElement("th");
+    const td2 = document.createElement("th");
+    const td3 = document.createElement("th");
+    const td4 = document.createElement("th");
+    td1.appendChild(document.createTextNode("nome_setor DO Setor"));
+    td2.appendChild(document.createTextNode("EXCLUIR"));
+    td3.appendChild(document.createTextNode("SELECIONAR"));
+    td4.appendChild(document.createTextNode("ATUALIZAR"));
+    linha1.appendChild(td1);
+    linha1.appendChild(td2);
+    linha1.appendChild(td3);
+    linha1.appendChild(td4);
+
+    get_setores();
+
+    btnCadastrar.onclick = function () {
+        post_setores();
+    }
+
+    function limparTabela() {
+        var qtdLinas = 1;
+        var totalLinhas = tabela.rows.length;
+        for (let i = qtdLinas; i < totalLinhas; i++) {
+            tabela.deleteRow(qtdLinas);
+        }
+
+    }
+    function delete_Setor(idSetor) {
+        const URI = "/setores/" + id_selecionado;
+        console.log(URI);
+        fetch(URI, {
+            method: "DELETE",
+            headers: {
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            console.log(respostaConvertida);
+            get_setores();
+        }).catch(erro => {
+            console.log(erro);
+        })
+    }
+    function construirTabela(objJson) {
+        limparTabela();
+
+        console.log(objJson.setores);
+        const setores = objJson.setores;
+
+
+        tabela.appendChild(linha1);
+        for (let Setor of setores) {
+
+            let nome_setor = Setor.nome_setor;
+            nome_setor = nome_setor.toLowerCase();
+            const linha1 = document.createElement("tr");
+            const btnExcluir = document.createElement("button");
+            btnExcluir.appendChild(document.createTextNode("Excluir"));
+            btnExcluir.onclick = function () {
+                const idSetor = Setor.nome_setor;
+                delete_Setor(idSetor);
+            }
+
+            const btnSelecionar = document.createElement("button");
+            btnSelecionar.appendChild(document.createTextNode("Selecionar"));
+            btnSelecionar.onclick = function () {
+                const idSetor = Setor.id_setor;
+                id_selecionado = idSetor;
+                txtSetor.value = Setor.nome_setor;
+            }
+
+            const btnAtualizar = document.createElement("button");
+            btnAtualizar.appendChild(document.createTextNode("Atualizar"));
+
+            btnAtualizar.onclick = function () {
+                put_setores(id_selecionado);
+            }
+
+            const td1 = document.createElement("td");
+            const td2 = document.createElement("td");
+            const td3 = document.createElement("td");
+            const td4 = document.createElement("td");
+            td1.appendChild(document.createTextNode(Setor.nome_setor));
+            td2.appendChild(btnExcluir);
+            td3.appendChild(btnSelecionar);
+            td4.appendChild(btnAtualizar);
+
+            linha1.appendChild(td1);
+            linha1.appendChild(td2);
+            linha1.appendChild(td3);
+            linha1.appendChild(td4);
+            tabela.appendChild(linha1);
+        }
+    }
+
+    function get_setores() {
+        const URI = "/setores";
+
+        fetch(URI, {
+            method: "GET",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            JSON_setores = JSON.parse(respostaConvertida);
+            console.log(JSON_setores.setores);
+            construirTabela(JSON_setores)
+        }).catch(erro => {
+            console.log(erro);
+        })
+    }
+
+
+    function put_setores(idSetor) {
+        const URI = "/setores/" + id_selecionado;
+        const nome_setor = txtSetor.value;
+        if (nome_setor == "") {
+            alert("o nome do Setor não pode ser vazio");
+            return;
+
+        }
+
+        const objSetor = {
+            setor: {
+                nome_setor: nome_setor,
+            }
+        }
+
+        fetch(URI, {
+            method: "PUT",
+            body: JSON.stringify(objSetor),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            const obj = JSON.parse(respostaConvertida);
+            if (obj.status == true) {
+                get_setores();
+            }
+            console.log(respostaConvertida);
+        }).catch(erro => {
+            console.log(erro);
+        })
+
+    }
+
+    function post_setores() {
+        const URI = "/setores";
+        const nome_setor = txtSetor.value;
+        if (nome_setor == "") {
+            alert("o nome do Setor não pode ser vazio");
+            return;
+
+        }
+
+        const objSetor = {
+            setor: {
+                nome_setor: nome_setor,
+            }
+        }
+
+        fetch(URI, {
+            method: "POST",
+            body: JSON.stringify(objSetor),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => {
+            return resposta.text();
+        }).then(respostaConvertida => {
+            const obj = JSON.parse(respostaConvertida);
+            if (obj.status == true) {
+                get_setores();
+            }
+            console.log(respostaConvertida);
+        }).catch(erro => {
+            console.log(erro);
+        })
+
+    }
+
+</script>
+
+<script>
+
+const txtArquivo = document.getElementById('txtArquivo');
+const btnEnviar = document.getElementById('btnEnviar');
+
+btnEnviar.onclick = function () {
+    // Verifica se um arquivo foi selecionado
+    if (txtArquivo.files.length === 0) {
+        alert("Por favor, selecione um arquivo para enviar.");
+        return;
+    }
+
+    const dados = new FormData();
+    dados.append('variavelArquivo', txtArquivo.files[0]);
+
+    const URI = "/setores/json";
+    
+    // Exibe um feedback ao usuário
+    btnEnviar.disabled = true; // Desabilita o botão
+    btnEnviar.textContent = "Enviando..."; // Atualiza o texto do botão
+
+    fetch(URI, {
+        method: "POST",
+        body: dados,
+        headers: {
+            'Authorization': 'Bearer ' + objUsuario.token
+        }        
+    })
+    .then((resposta) => {
+        if (!resposta.ok) {
+            throw new Error(`Erro: ${resposta.status} ${resposta.statusText}`);
+        }
+        return resposta.json(); // Converte a resposta diretamente para JSON
+    })
+    .then(resposta => {
+        console.log(resposta);
+        if (resposta.status === true) {
+            alert("Setores cadastrados com sucesso");
+        } else {
+            alert("Erro ao cadastrar setores: " + resposta.msg);
+        }
+    })
+    .catch(erro => {
+        console.error(erro);
+        alert("Ocorreu um erro ao enviar o arquivo. Tente novamente.");
+    })
+    .finally(() => {
+        btnEnviar.disabled = false; // Reabilita o botão
+        btnEnviar.textContent = "Enviar"; // Restaura o texto do botão
+    });
+};
+
+</script>
+
+</html>

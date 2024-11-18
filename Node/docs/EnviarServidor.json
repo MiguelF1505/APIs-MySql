@@ -1,0 +1,7 @@
+{
+    "setores": [
+        {"nome_setor": "Teste1"},
+        {"nome_setor": "Teste2"},
+        {"nome_setor": "Teste3"}
+    ]
+}

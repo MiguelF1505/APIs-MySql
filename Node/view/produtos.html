@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="styleControl.css">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Oswald:wght@500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <a href="painel.html" class="PainelRet">Painel</a><br>
+    <div class="input">
+        <input type="text" id="txtNomeProduto" placeholder="Nome Produto">
+        <input type="text" id="txtPrecoProduto" placeholder="Preço Produto">
+        <input type="text" id="txtUnidadesProduto" placeholder="Unidades Produto">
+        <input type="text" id="txtIdCategoria" placeholder="ID Categoria"><br>
+        <a id="btnCadastrar" class="enviar">Cadastrar Produto</a>
+        <div id="divDados"></div>
+    </div>
+</body>
+
+<script>
+    let JSON_Produtos = {};
+    const dadosLocalStorage = localStorage.getItem("dados");
+    const objUsuario = JSON.parse(dadosLocalStorage);
+
+    const divDados = document.getElementById("divDados");
+    const txtProduto = document.getElementById("txtNomeProduto");
+    const txtPrecoProduto = document.getElementById("txtPrecoProduto");
+    const txtUnidadesProduto = document.getElementById("txtUnidadesProduto");
+    const txtIdCategoria = document.getElementById("txtIdCategoria");
+
+    const btnCadastrar = document.getElementById("btnCadastrar");
+
+    const tabela = document.createElement("table");
+
+    divDados.appendChild(tabela);
+    const linha1 = document.createElement("tr");
+    const td0 = document.createElement("th");
+    const td1 = document.createElement("th");
+    const td2 = document.createElement("th");
+    const td3 = document.createElement("th");
+    const td4 = document.createElement("th");
+    const td5 = document.createElement("th");
+    const td6 = document.createElement("th");
+    const td7 = document.createElement("th"); // Nova coluna para ID Categoria
+    td0.appendChild(document.createTextNode("NOME"));
+    td1.appendChild(document.createTextNode("UNIDADES"));
+    td2.appendChild(document.createTextNode("PREÇO"));
+    td7.appendChild(document.createTextNode("ID CATEGORIA")); // Cabeçalho da nova coluna
+    td3.appendChild(document.createTextNode("EXCLUIR"));
+    td4.appendChild(document.createTextNode("SELECIONAR"));
+    td5.appendChild(document.createTextNode("ATUALIZAR"));
+    linha1.appendChild(td0);
+    linha1.appendChild(td1);
+    linha1.appendChild(td2);
+    linha1.appendChild(td7); // Adicionar nova coluna ao cabeçalho
+    linha1.appendChild(td3);
+    linha1.appendChild(td4);
+    linha1.appendChild(td5);
+    tabela.appendChild(linha1);
+
+    get_Produtos();
+
+    btnCadastrar.onclick = function () {
+        post_Produtos();
+    }
+
+    function limparTabela() {
+        var qtdLinas = 1;
+        var totalLinhas = tabela.rows.length;
+        for (let i = qtdLinas; i < totalLinhas; i++) {
+            tabela.deleteRow(qtdLinas);
+        }
+    }
+
+    function delete_Produto(idProduto) {
+        const URI = "/produtos/" + idProduto;
+        fetch(URI, {
+            method: "DELETE",
+            headers: {
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => resposta.text())
+        .then(respostaConvertida => {
+            get_Produtos();
+        }).catch(erro => {
+            console.log(erro);
+        });
+    }
+
+    function construirTabela(objJson) {
+        limparTabela();
+        const Produtos = objJson.produtos;
+
+        for (let Produto of Produtos) {
+            const linha = document.createElement("tr");
+
+            const btnExcluir = document.createElement("button");
+            btnExcluir.appendChild(document.createTextNode("Excluir"));
+            btnExcluir.onclick = function () {
+                delete_Produto(Produto.id_produto);
+            }
+
+            const btnSelecionar = document.createElement("button");
+            btnSelecionar.appendChild(document.createTextNode("Selecionar"));
+            btnSelecionar.onclick = function () {
+                txtProduto.value = Produto.nome_produto;
+                txtPrecoProduto.value = Produto.preco_produto;
+                txtUnidadesProduto.value = Produto.unidades_produto;
+                txtIdCategoria.value = Produto.id_categoria;
+            }
+
+            const btnAtualizar = document.createElement("button");
+            btnAtualizar.appendChild(document.createTextNode("Atualizar"));
+            btnAtualizar.onclick = function () {
+                put_Produtos(Produto.id_produto);
+            }
+
+            const td1 = document.createElement("td");
+            const td2 = document.createElement("td");
+            const td3 = document.createElement("td");
+            const td7 = document.createElement("td"); // Nova célula para ID Categoria
+            const td4 = document.createElement("td");
+            const td5 = document.createElement("td");
+            const td6 = document.createElement("td");
+
+            td1.appendChild(document.createTextNode(Produto.nome_produto));
+            td2.appendChild(document.createTextNode(Produto.unidades_produto));
+            td3.appendChild(document.createTextNode("R$ " + Produto.preco_produto));
+            td7.appendChild(document.createTextNode(Produto.id_categoria)); // Inserir ID Categoria na tabela
+            td4.appendChild(btnExcluir);
+            td5.appendChild(btnSelecionar);
+            td6.appendChild(btnAtualizar);
+
+            linha.appendChild(td1);
+            linha.appendChild(td2);
+            linha.appendChild(td3);
+            linha.appendChild(td7); // Adicionar ID Categoria à linha
+            linha.appendChild(td4);
+            linha.appendChild(td5);
+            linha.appendChild(td6);
+            tabela.appendChild(linha);
+        }
+    }
+
+    function get_Produtos() {
+        const URI = "/produtos";
+        fetch(URI, {
+            method: "GET",
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => resposta.json())
+        .then(respostaConvertida => {
+            construirTabela(respostaConvertida);
+        }).catch(erro => {
+            console.log(erro);
+        });
+    }
+
+    function post_Produtos() {
+        const URI = "/produtos";
+        const NomeProduto = txtProduto.value;
+        const PrecoProduto = parseFloat(txtPrecoProduto.value);
+        const UnidadesProduto = parseInt(txtUnidadesProduto.value);
+        const IdCategoria = parseInt(txtIdCategoria.value);
+
+        if (!NomeProduto || !PrecoProduto || !UnidadesProduto || !IdCategoria) {
+            alert("Todos os campos são obrigatórios.");
+            return;
+        }
+
+        const objProduto = {
+            nome_produto: NomeProduto,
+            preco_produto: PrecoProduto,
+            unidades_produto: UnidadesProduto,
+            id_categoria: IdCategoria
+        };
+
+        fetch(URI, {
+            method: "POST",
+            body: JSON.stringify(objProduto),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => resposta.json())
+        .then(() => get_Produtos())
+        .catch(erro => console.log(erro));
+    }
+
+    function put_Produtos(idProduto) {
+        const URI = "/produtos/" + idProduto;
+        const NomeProduto = txtProduto.value;
+        const PrecoProduto = parseFloat(txtPrecoProduto.value);
+        const UnidadesProduto = parseInt(txtUnidadesProduto.value);
+        const IdCategoria = parseInt(txtIdCategoria.value);
+
+        if (!NomeProduto || !PrecoProduto || !UnidadesProduto || !IdCategoria) {
+            alert("Todos os campos são obrigatórios.");
+            return;
+        }
+
+        const objProduto = {
+            nome_produto: NomeProduto,
+            preco_produto: PrecoProduto,
+            unidades_produto: UnidadesProduto,
+            id_categoria: IdCategoria
+        };
+
+        fetch(URI, {
+            method: "PUT",
+            body: JSON.stringify(objProduto),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + objUsuario.token
+            }
+        }).then((resposta) => resposta.json())
+        .then(() => get_Produtos())
+        .catch(erro => console.log(erro));
+    }
+</script>
+
+</html>

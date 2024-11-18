@@ -1,0 +1,176 @@
+@charset "UTF-8";
+
+* {
+    margin: 0px;
+    padding: 0px;
+}
+
+.PainelRet{
+    font-size: 30px;
+    color: white;
+}
+
+body {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #2F4F4F;
+}
+
+div.inputs {
+    display: flex;
+    flex-flow: column nowrap;
+    width: 400px;
+    height: 400px;
+    margin: 18vh auto;
+    padding: 30px;
+    background-color: #4CAF50;
+}
+
+div.inputs > p, input, a {
+    font-size: 1.7em;
+}
+
+div.container > p, input, a {
+    font-size: 1.7em;
+}
+
+div.input {
+    background-color: green;
+    text-align: center;
+    margin: 0px auto;
+    padding: 30px;
+}
+
+div.container {
+    display: flex;
+    flex-flow: column nowrap;
+    width: 300px;
+    height: 360px;
+    margin: 18vh auto;
+    padding: 30px;
+    background-color: #4CAF50;
+}
+
+a.enviar, a.del {
+    margin: 30px 0px 0px 0px;
+    background-color: #F0C808;
+    box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 0.2);
+    transition-duration: 0.3s;
+    text-align: center;
+    font-weight: bolder;
+    text-decoration: none;
+    color: white;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+a.enviar:hover, a.del:hover {
+    background-color: #E5A200;
+    transform: scale(1.05);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+
+header {
+    padding: 20px 0px 20px 20px;
+    background-color: #007BFF;
+    font-size: 1.7em;
+}
+
+section#manuseio {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-evenly;
+    width: 500px;
+    margin: 18vh auto 0px auto;
+}
+
+section#manuseio > a {
+    background-color: #FF5722;
+    border: 2px solid black;
+    padding: 10px;
+    font-size: 1.7em;
+    margin-bottom: 30px;
+    transition-duration: 0.3s;
+    cursor: pointer;
+}
+
+section#manuseio > a:hover {
+    background-color: black;
+    border: 2px solid #007BFF;
+    color: #F0C808;
+}
+
+input {
+    border: 3px solid #C0C0C0;
+}
+
+h1 {
+    text-align: center;
+    font-family: 'Roboto Slab', serif;
+    color: #5D3FD3;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
+                 0 0 20px rgba(255, 255, 255, 0.6),
+                 0 0 30px rgba(255, 255, 255, 0.4);
+    transition-duration: 0.6s;
+    background-color: transparent;
+}
+
+h1:hover {
+    transform: rotateZ(10deg);
+    text-shadow: 0 0 15px rgba(255, 255, 255, 1),
+    0 0 25px rgba(255, 255, 255, 0.8),
+    0 0 35px rgba(255, 255, 255, 0.6);
+transform: scale(1.05);
+transition: 0.3s ease-in-out;
+cursor: pointer;
+}
+
+section#ler {
+    width: 100vw;
+    height: 400px;
+    background-color: white;
+    padding: 10px;
+}
+
+section#ler > p {
+    margin: 0px 0px 20px 0px;
+    font-size: 1.6em;
+    font-weight: bolder;
+}
+
+a.seta_para_voltar {
+    position: absolute;
+    font-size: 3em;
+    right: 95.65vw;
+    top: -1.14%;
+    transition-duration: 0.5s;
+}
+
+a.seta_para_voltar:hover {
+    box-shadow: 5px 5px 8px 0px;
+    cursor: pointer;
+}
+
+
+a.seta {
+    position: relative;
+    font-size: 3em;
+    right: 1.2%;
+    top: -4.6%;
+    transition-duration: 0.5s;
+}
+
+a.seta:hover {
+    box-shadow: 5px 5px 8px 0px;
+    cursor: pointer;
+}
+
+th{
+    margin: 20px;
+    padding: 10px;
+    font-size: large;
+}
